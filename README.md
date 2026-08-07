@@ -77,6 +77,14 @@ var NAMES = ['GAV', 'GIN'];
 
 Keep them short, three or four characters, since they double as the row tag on every game card.
 
+## Fonts
+
+The font stack is Comic Sans MS first, then Chalkboard SE and Marker Felt for iOS, then **Comic Neue**, which is embedded directly in `index.html` as a base64 woff2.
+
+Android ships no Comic Sans, so without the embedded font it fell back to Roboto and lost the hand-drawn look. Comic Neue is a free redraw of Comic Sans under the SIL Open Font License, so it can be bundled and redistributed. Embedding it rather than linking Google Fonts keeps the page offline-capable and means no request has to succeed for the page to look right.
+
+This adds about 40 KB to the file, taking it to roughly 65 KB total. Still one file, still no dependencies.
+
 ## The goat art
 
 The goats are hand-drawn inline SVG defined once as a `<symbol id="goat">` near the top of `<body>`, then reused everywhere via `<use href="#goat">`. Nothing is fetched from the internet, so there are no licences to worry about, nothing breaks offline, and it stays crisp at any size. To restyle it, edit the fill colours in that symbol: `#fbf3e4` is the face, `#c8a04a` the horns, `#5b4636` the outline.
