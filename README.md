@@ -16,7 +16,7 @@ All five run concurrently and independently.
 
 ## How to use it
 
-1. Tap either name at the top to rename the players. Names are limited to 12 characters and the first three letters show as the row tag on each game card.
+1. The two players are fixed as **GAV** (orange) and **GIN** (teal). See "Changing the players" below to edit them.
 2. When someone calls a word, tap that word on their row. It fills with their colour.
 3. Tapped the wrong one? Tap it again to un-claim it. There is no undo history, the toggle is the undo.
 4. When a player has all three words in a game, that card is covered by a "wins the round" panel. Tap **Score it** to confirm.
@@ -67,13 +67,27 @@ Send that link to your friend. On an iPhone, Share > Add to Home Screen gives it
 - Email or message the `index.html` file to yourself and open it from your phone's Files app. Works fully offline, which matters if the drive goes through patchy coverage.
 - Drag the file onto [netlify.com/drop](https://app.netlify.com/drop) for an instant public URL with no account required for the first deploy.
 
+## Changing the players
+
+Names are set in one place near the top of the script block in `index.html`:
+
+```js
+var NAMES = ['GAV', 'GIN'];
+```
+
+Keep them short, three or four characters, since they double as the row tag on every game card.
+
+## The goat art
+
+The goats are hand-drawn inline SVG defined once as a `<symbol id="goat">` near the top of `<body>`, then reused everywhere via `<use href="#goat">`. Nothing is fetched from the internet, so there are no licences to worry about, nothing breaks offline, and it stays crisp at any size. To restyle it, edit the fill colours in that symbol: `#fbf3e4` is the face, `#c8a04a` the horns, `#5b4636` the outline.
+
 ## Changing the games
 
 The word sets are defined near the top of the script block in `index.html`:
 
 ```js
 var GAMES = [
-  { id: 'g1', words: ['float', 'boat', 'goat'] },
+  { words: ['float', 'boat', 'goat'] },
   ...
 ];
 ```
