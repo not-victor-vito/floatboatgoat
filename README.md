@@ -21,7 +21,14 @@ All five run concurrently and independently.
 3. Tapped the wrong one? Tap it again to un-claim it. There is no undo history, the toggle is the undo.
 4. When a player has all three words in a game, that card is covered by a "wins the round" panel. Tap **Score it** to confirm.
 5. Confirming adds 1 to that player's overall total and 1 to their tally for that game, then clears only that game's board. The other four games keep their progress untouched.
-6. **Reset everything** at the bottom needs two taps. The first tap arms it and turns it red, the second wipes all scores and boards. It disarms itself after four seconds if you do not follow through.
+6. **Undo** appears at the bottom straight after a round is scored, labelled with who scored and on which game. Tapping it takes the point back off the board and off the totals, and returns that game to all three words claimed but unlocked, so you can tap the wrong one off and carry on. It only ever undoes the most recent scored round, and it disappears once used, once another round is scored, or on a full reset. Progress you made in other games in the meantime is untouched.
+7. **Reset everything** at the bottom needs two taps. The first tap arms it and turns it red, the second wipes all scores and boards. It disarms itself after four seconds if you do not follow through.
+
+### Celebrations
+
+Confirming a round sets off a confetti burst behind the win panel, sends a goat galloping across the card, and pops the winner's total. All of it is CSS animation on elements that are removed once they finish.
+
+Anyone who has "reduce motion" turned on in their phone's accessibility settings gets none of it, including the bouncing goat and the chip pop. Scoring still works exactly the same.
 
 While a win is waiting to be confirmed, that game's buttons are locked so a bump in the car cannot change the result. The other games stay live.
 
@@ -75,6 +82,7 @@ A few deliberate choices, in case you come back to this later:
 - The win panel exists in every card from the start and is toggled with the `hidden` attribute rather than being rebuilt each time.
 - Chip and Score it taps go through one delegated listener on the games container, not 36 individual listeners.
 - Element references are cached during build, so nothing calls `getElementById` in a loop.
+- Undo stores a snapshot of the scored game only, not the whole board, so undoing cannot roll back claims made in other games afterwards.
 
 None of this matters at this scale, five games and 30 buttons. It just keeps the file easy to follow.
 
@@ -94,7 +102,7 @@ The font stack is Comic Sans MS first, then Chalkboard SE and Marker Felt for iO
 
 Android ships no Comic Sans, so without the embedded font it fell back to Roboto and lost the hand-drawn look. Comic Neue is a free redraw of Comic Sans under the SIL Open Font License, so it can be bundled and redistributed. Embedding it rather than linking Google Fonts keeps the page offline-capable and means no request has to succeed for the page to look right.
 
-The font is subset with `pyftsubset` down to printable ASCII plus the middot separator, which is everything the page can display. That cuts the two weights from 39 KB to 12.6 KB before base64. The whole page is about 31 KB. Still one file, still no dependencies.
+The font is subset with `pyftsubset` down to printable ASCII plus the middot separator, which is everything the page can display. That cuts the two weights from 39 KB to 12.6 KB before base64. The whole page is about 36 KB. Still one file, still no dependencies.
 
 If you ever add characters outside plain ASCII, such as a macron in a name, they will fall back to the system font. Re-subset with a wider character set if that happens.
 

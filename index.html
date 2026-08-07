@@ -198,7 +198,75 @@
   .winbtn.b2 { background: var(--gin); }
   .winbtn:active { transform: translate(2px, 3px); box-shadow: none; }
 
+  .ptotal.bump { animation: bump .55s ease; }
+  @keyframes bump {
+    0% { transform: scale(1) rotate(0deg); }
+    40% { transform: scale(1.35) rotate(-6deg); }
+    70% { transform: scale(.95) rotate(3deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  .confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 6; }
+  .confetti i {
+    position: absolute;
+    top: 44%;
+    left: 50%;
+    width: 9px;
+    height: 13px;
+    border-radius: 2px;
+    opacity: 0;
+    animation: burst .95s ease-out forwards;
+    animation-delay: var(--d);
+  }
+  @keyframes burst {
+    0% { transform: translate(0, 0) rotate(0deg) scale(.5); opacity: 1; }
+    70% { opacity: 1; }
+    100% { transform: translate(var(--x), var(--y)) rotate(var(--r)) scale(1); opacity: 0; }
+  }
+
+  .gallop {
+    position: absolute;
+    bottom: 6px;
+    left: -60px;
+    width: 52px;
+    height: 52px;
+    z-index: 7;
+    pointer-events: none;
+    animation: gallop .95s ease-in forwards;
+  }
+  @keyframes gallop {
+    0% { left: -60px; opacity: 0; transform: rotate(-10deg); }
+    12% { opacity: 1; }
+    35% { transform: rotate(8deg) translateY(-14px); }
+    60% { transform: rotate(-6deg) translateY(0); }
+    85% { opacity: 1; transform: rotate(7deg) translateY(-12px); }
+    100% { left: 100%; opacity: 0; transform: rotate(-4deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .confetti, .gallop { display: none; }
+    .winbar svg, .chip.on, .ptotal.bump { animation: none; }
+  }
+
   .footer { margin-top: 14px; text-align: center; }
+  .undo {
+    appearance: none;
+    display: block;
+    width: 100%;
+    background: var(--paper);
+    border: 3px solid var(--line);
+    color: var(--ink);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 11px 16px;
+    border-radius: 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    box-shadow: 2px 3px 0 var(--shadow);
+  }
+  .undo[hidden] { display: none; }
+  .undo:active { transform: translate(2px, 3px); box-shadow: none; }
   .reset {
     appearance: none;
     background: var(--paper);
@@ -259,6 +327,7 @@
   <main id="games"></main>
 
   <div class="footer">
+    <button class="undo" id="undo" type="button" hidden></button>
     <button class="reset" id="reset">Reset everything</button>
     <p class="hint">Tap a word to claim it, tap again to un-claim. Claim all three and the round is yours.</p>
   </div>
@@ -281,10 +350,12 @@
   var gamesEl = document.getElementById('games');
   var totalEls = [document.getElementById('total0'), document.getElementById('total1')];
   var resetBtn = document.getElementById('reset');
+  var undoBtn = document.getElementById('undo');
 
   var totals = [0, 0];
   var state = [];
   var ui = [];
+  var lastScore = null;
 
   function blankClaims() {
     return [[false, false, false], [false, false, false]];
@@ -295,6 +366,7 @@
       return { claims: blankClaims(), wins: [0, 0], pending: null };
     });
     totals = [0, 0];
+    lastScore = null;
   }
 
   function goatSvg(cls) {
@@ -320,7 +392,7 @@
     GAMES.forEach(function (game, gi) {
       var label = game.words.join(' \u00b7 ');
       var card = el('section', 'game');
-      var refs = { chips: [[], []] };
+      var refs = { chips: [[], []], card: card };
 
       card.appendChild(goatSvg('ghost'));
 
@@ -384,11 +456,69 @@
   function confirmWin(gi) {
     var g = state[gi];
     if (g.pending === null) return;
-    g.wins[g.pending] += 1;
-    totals[g.pending] += 1;
+    var pi = g.pending;
+
+    // Snapshot just this game so undo cannot clobber progress made elsewhere.
+    lastScore = { gi: gi, pi: pi, claims: g.claims.map(function (row) { return row.slice(); }) };
+
+    g.wins[pi] += 1;
+    totals[pi] += 1;
     g.claims = blankClaims();
     g.pending = null;
     render();
+    celebrate(gi, pi);
+  }
+
+  function undoScore() {
+    if (!lastScore) return;
+    var snap = lastScore;
+    var g = state[snap.gi];
+    g.wins[snap.pi] -= 1;
+    totals[snap.pi] -= 1;
+    // Board goes back to all three claimed, but unlocked, so the bad call can be tapped off.
+    g.claims = snap.claims.map(function (row) { return row.slice(); });
+    g.pending = null;
+    lastScore = null;
+    render();
+  }
+
+  function celebrate(gi, pi) {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var total = totalEls[pi];
+    total.classList.remove('bump');
+    void total.offsetWidth;
+    total.classList.add('bump');
+
+    var card = ui[gi].card;
+    var goat = goatSvg('gallop');
+    card.appendChild(goat);
+    setTimeout(function () {
+      if (goat.parentNode) goat.parentNode.removeChild(goat);
+    }, 1000);
+  }
+
+  var CONFETTI_COLOURS = ['#e8562a', '#1f9e8f', '#e8b42a', '#c8a04a', '#7bc47f'];
+
+  function confetti(bar) {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var layer = document.createElement('div');
+    layer.className = 'confetti';
+    for (var i = 0; i < 16; i++) {
+      var bit = document.createElement('i');
+      var angle = (Math.PI * 2 * i) / 16 + Math.random() * 0.35;
+      var dist = 60 + Math.random() * 55;
+      bit.style.setProperty('--x', Math.cos(angle) * dist + 'px');
+      bit.style.setProperty('--y', Math.sin(angle) * dist * 0.7 + 'px');
+      bit.style.setProperty('--r', Math.round(Math.random() * 720 - 360) + 'deg');
+      bit.style.setProperty('--d', Math.round(Math.random() * 120) + 'ms');
+      bit.style.background = CONFETTI_COLOURS[i % CONFETTI_COLOURS.length];
+      layer.appendChild(bit);
+    }
+    bar.appendChild(layer);
+    setTimeout(function () {
+      if (layer.parentNode) layer.parentNode.removeChild(layer);
+    }, 1200);
   }
 
   function render() {
@@ -416,10 +546,22 @@
       } else {
         r.winText.textContent = NAMES[g.pending] + ' wins the round!';
         r.winBtn.className = 'winbtn b' + (g.pending + 1);
-        r.bar.hidden = false;
+        if (r.bar.hidden) {
+          r.bar.hidden = false;
+          confetti(r.bar);
+        }
       }
     }
+
+    if (lastScore) {
+      undoBtn.textContent = 'Undo: ' + NAMES[lastScore.pi] + ' on ' + GAMES[lastScore.gi].words.join(' \u00b7 ');
+      undoBtn.hidden = false;
+    } else {
+      undoBtn.hidden = true;
+    }
   }
+
+  undoBtn.addEventListener('click', undoScore);
 
   // One delegated listener rather than one per button.
   gamesEl.addEventListener('click', function (e) {
