@@ -67,6 +67,17 @@ Send that link to your friend. On an iPhone, Share > Add to Home Screen gives it
 - Email or message the `index.html` file to yourself and open it from your phone's Files app. Works fully offline, which matters if the drive goes through patchy coverage.
 - Drag the file onto [netlify.com/drop](https://app.netlify.com/drop) for an instant public URL with no account required for the first deploy.
 
+## Notes on how it is built
+
+A few deliberate choices, in case you come back to this later:
+
+- The DOM is built once at load. `render()` only changes text content and class names after that, never creating or destroying nodes.
+- The win panel exists in every card from the start and is toggled with the `hidden` attribute rather than being rebuilt each time.
+- Chip and Score it taps go through one delegated listener on the games container, not 36 individual listeners.
+- Element references are cached during build, so nothing calls `getElementById` in a loop.
+
+None of this matters at this scale, five games and 30 buttons. It just keeps the file easy to follow.
+
 ## Changing the players
 
 Names are set in one place near the top of the script block in `index.html`:
@@ -83,7 +94,9 @@ The font stack is Comic Sans MS first, then Chalkboard SE and Marker Felt for iO
 
 Android ships no Comic Sans, so without the embedded font it fell back to Roboto and lost the hand-drawn look. Comic Neue is a free redraw of Comic Sans under the SIL Open Font License, so it can be bundled and redistributed. Embedding it rather than linking Google Fonts keeps the page offline-capable and means no request has to succeed for the page to look right.
 
-This adds about 40 KB to the file, taking it to roughly 65 KB total. Still one file, still no dependencies.
+The font is subset with `pyftsubset` down to printable ASCII plus the middot separator, which is everything the page can display. That cuts the two weights from 39 KB to 12.6 KB before base64. The whole page is about 31 KB. Still one file, still no dependencies.
+
+If you ever add characters outside plain ASCII, such as a macron in a name, they will fall back to the system font. Re-subset with a wider character set if that happens.
 
 ## The goat art
 
