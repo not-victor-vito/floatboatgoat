@@ -37,14 +37,25 @@ While a win is waiting to be confirmed, that game's buttons are locked so a bump
 - The two big numbers at the top are total rounds won across all five games. The header stays stuck to the top of the screen as you scroll.
 - The small orange-blue pair on each game card is that game's own record, player 1 first.
 
-## Important: state is per device
+## Saving
 
-The page holds its state in memory only. That means:
+Scores save to the browser's `localStorage` on every change. The footer shows a "Saved" line with the time of the last write.
 
-- Opening it on two phones gives you two separate scoreboards that do not talk to each other. Pick one phone as the scorekeeper.
-- Reloading the page, or the browser dropping the tab from memory while your phone is locked for a long time, will clear the scores.
+Survives a refresh, closing the tab, closing the browser, and the phone restarting. Everything comes back: totals, per-game tallies, part-finished boards, a win panel that was waiting to be confirmed, and the undo button.
 
-If you want the scores to survive a reload, that is a small change to save state into the browser's local storage. Ask and it can be added.
+What clears it:
+
+- Clearing browsing data or site data.
+- **Private browsing**, where storage is blocked entirely. The page still works, it just shows a red "Not saving on this device" line instead of the timestamp.
+- **iOS Safari deletes localStorage for sites you have not opened in seven days.** Fine for a single trip. If this becomes a tally you keep over months, add it to the home screen, which makes Safari treat it as a web app and hold the data longer.
+
+### State is still per device
+
+Two phones means two separate scoreboards that do not talk to each other. Persistence does not change that. Pick one phone as the scorekeeper.
+
+### Stale saves
+
+Saved data carries a version number and a signature of the current word lists and player names. If you edit `GAMES` or `NAMES`, the signature stops matching and the old save is discarded rather than restored into a layout it no longer fits. Corrupt or hand-edited data is also rejected and the page starts fresh, so a bad save can never leave you with a broken board.
 
 ## Hosting it on GitHub Pages
 
@@ -102,7 +113,7 @@ The font stack is Comic Sans MS first, then Chalkboard SE and Marker Felt for iO
 
 Android ships no Comic Sans, so without the embedded font it fell back to Roboto and lost the hand-drawn look. Comic Neue is a free redraw of Comic Sans under the SIL Open Font License, so it can be bundled and redistributed. Embedding it rather than linking Google Fonts keeps the page offline-capable and means no request has to succeed for the page to look right.
 
-The font is subset with `pyftsubset` down to printable ASCII plus the middot separator, which is everything the page can display. That cuts the two weights from 39 KB to 12.6 KB before base64. The whole page is about 36 KB. Still one file, still no dependencies.
+The font is subset with `pyftsubset` down to printable ASCII plus the middot separator, which is everything the page can display. That cuts the two weights from 39 KB to 12.6 KB before base64. The whole page is about 39 KB. Still one file, still no dependencies.
 
 If you ever add characters outside plain ASCII, such as a macron in a name, they will fall back to the system font. Re-subset with a wider character set if that happens.
 

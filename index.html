@@ -281,6 +281,8 @@
   }
   .reset.arm { border-color: #d1462b; color: #d1462b; border-style: solid; }
   .hint { font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+  .saved { font-size: 12px; color: var(--muted); opacity: .8; margin: 6px 0 0; }
+  .saved.warn { color: #c14a2b; opacity: 1; }
 </style>
 </head>
 <body>
@@ -330,6 +332,7 @@
     <button class="undo" id="undo" type="button" hidden></button>
     <button class="reset" id="reset">Reset everything</button>
     <p class="hint">Tap a word to claim it, tap again to un-claim. Claim all three and the round is yours.</p>
+    <p class="saved" id="saved">Scores save automatically on this device.</p>
   </div>
 
 </div>
@@ -451,6 +454,7 @@
     g.claims[pi][wi] = !g.claims[pi][wi];
     if (g.claims[pi].every(Boolean)) g.pending = pi;
     render();
+    save();
   }
 
   function confirmWin(gi) {
@@ -466,6 +470,7 @@
     g.claims = blankClaims();
     g.pending = null;
     render();
+    save();
     celebrate(gi, pi);
   }
 
@@ -480,6 +485,7 @@
     g.pending = null;
     lastScore = null;
     render();
+    save();
   }
 
   function celebrate(gi, pi) {
@@ -561,6 +567,93 @@
     }
   }
 
+  // ---- persistence -------------------------------------------------------
+  // Version plus a signature of the game and player setup, so a saved board
+  // from an older word list is discarded instead of restored into a mismatch.
+  var STORE_KEY = 'goatwatch';
+  var STORE_VERSION = 1;
+  var SIG = GAMES.map(function (g) { return g.words.join(','); }).join('|') + '::' + NAMES.join(',');
+  var savedEl = document.getElementById('saved');
+  var canStore = true;
+
+  function stamp(ms) {
+    savedEl.className = 'saved';
+    savedEl.textContent = 'Saved ' + new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function save() {
+    if (!canStore) return;
+    var now = Date.now();
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        v: STORE_VERSION,
+        sig: SIG,
+        at: now,
+        totals: totals,
+        state: state,
+        lastScore: lastScore
+      }));
+      stamp(now);
+    } catch (e) {
+      storageOff();
+    }
+  }
+
+  function storageOff() {
+    canStore = false;
+    savedEl.className = 'saved warn';
+    savedEl.textContent = 'Not saving on this device. Private browsing blocks storage.';
+  }
+
+  function validClaims(claims, n) {
+    return Array.isArray(claims) && claims.length === 2 && claims.every(function (row) {
+      return Array.isArray(row) && row.length === n && row.every(function (v) { return typeof v === 'boolean'; });
+    });
+  }
+
+  function validPlayer(pi) {
+    return pi === 0 || pi === 1;
+  }
+
+  function load() {
+    var raw;
+    try {
+      raw = localStorage.getItem(STORE_KEY);
+    } catch (e) {
+      storageOff();
+      return false;
+    }
+    if (!raw) return false;
+
+    var d;
+    try { d = JSON.parse(raw); } catch (e) { return false; }
+
+    if (!d || d.v !== STORE_VERSION || d.sig !== SIG) return false;
+    if (!Array.isArray(d.totals) || d.totals.length !== 2) return false;
+    if (!Array.isArray(d.state) || d.state.length !== GAMES.length) return false;
+
+    for (var i = 0; i < d.state.length; i++) {
+      var g = d.state[i];
+      if (!g) return false;
+      if (!validClaims(g.claims, GAMES[i].words.length)) return false;
+      if (!Array.isArray(g.wins) || g.wins.length !== 2) return false;
+      if (g.pending !== null && !validPlayer(g.pending)) return false;
+    }
+
+    state = d.state.map(function (g) {
+      return { claims: g.claims, wins: [g.wins[0] | 0, g.wins[1] | 0], pending: g.pending };
+    });
+    totals = [d.totals[0] | 0, d.totals[1] | 0];
+
+    var ls = d.lastScore;
+    lastScore = (ls && GAMES[ls.gi] && validPlayer(ls.pi) && validClaims(ls.claims, GAMES[ls.gi].words.length))
+      ? { gi: ls.gi, pi: ls.pi, claims: ls.claims }
+      : null;
+
+    if (d.at) stamp(d.at);
+    return true;
+  }
+
   undoBtn.addEventListener('click', undoScore);
 
   // One delegated listener rather than one per button.
@@ -593,9 +686,11 @@
     disarm();
     initState();
     render();
+    save();
   });
 
   initState();
+  load();
   build();
   render();
 })();
