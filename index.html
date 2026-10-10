@@ -68,7 +68,36 @@
     color: var(--muted);
     margin: 0 0 6px;
   }
-  .scoreboard { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pl0 { --pc: #e8562a; --pd: #b93c17; --pt: rgba(232,86,42,.14); }
+  .pl1 { --pc: #1f9e8f; --pd: #14776b; --pt: rgba(31,158,143,.14); }
+  .pl2 { --pc: #8a5cc2; --pd: #6b43a3; --pt: rgba(138,92,194,.14); }
+  .pl3 { --pc: #bf8a0a; --pd: #8f6606; --pt: rgba(191,138,10,.16); }
+
+  .bannerrow { position: relative; }
+  .gear {
+    appearance: none;
+    position: absolute;
+    right: 0;
+    top: -4px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--paper);
+    border: 3px dashed var(--line);
+    border-radius: 50%;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .gear svg { width: 18px; height: 18px; }
+  .gear:active { transform: scale(.92); }
+
+  .scoreboard { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .scoreboard > .pcard { min-width: 0; }
+  .scoreboard.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .scoreboard.n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
   .pcard {
     position: relative;
     background: var(--paper);
@@ -78,13 +107,19 @@
     text-align: center;
     box-shadow: 3px 4px 0 var(--shadow);
   }
-  .pcard.p1 { border-color: var(--gav); transform: rotate(-1.1deg); }
-  .pcard.p2 { border-color: var(--gin); transform: rotate(1.1deg); }
-  .pmug { display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .pcard { border-color: var(--pc); }
+  .pcard.pl0, .pcard.pl2 { transform: rotate(-1.1deg); }
+  .pcard.pl1, .pcard.pl3 { transform: rotate(1.1deg); }
+  .pmug { display: flex; align-items: center; justify-content: center; gap: 6px; min-width: 0; }
   .pmug svg { width: 30px; height: 30px; flex: 0 0 30px; }
-  .pname { font-weight: 700; font-size: 20px; letter-spacing: .05em; }
-  .pcard.p1 .pname { color: var(--gav); }
-  .pcard.p2 .pname { color: var(--gin); }
+  .pname { font-weight: 700; font-size: 20px; letter-spacing: .05em; color: var(--pc); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .n3 .pcard, .n4 .pcard { padding: 5px 4px 6px; border-radius: 16px; }
+  .n3 .pname { font-size: 17px; }
+  .n3 .pmug svg { width: 22px; height: 22px; flex-basis: 22px; }
+  .n4 .pname { font-size: 14px; letter-spacing: .02em; }
+  .n4 .pmug svg { display: none; }
+  .n3 .ptotal, .n4 .ptotal { font-size: 30px; }
+  .n3 .plabel, .n4 .plabel { display: none; }
   .ptotal { font-size: 36px; font-weight: 700; line-height: 1; margin-top: 2px; }
   .plabel { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 
@@ -118,8 +153,7 @@
   }
   .gtitle { font-size: 14px; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
   .gwins { font-size: 15px; font-weight: 700; white-space: nowrap; }
-  .gwins .w1 { color: var(--gav); }
-  .gwins .w2 { color: var(--gin); }
+  .gwins .w { color: var(--pc); }
   .gwins .sep { color: var(--muted); margin: 0 3px; }
 
   .prow { display: flex; align-items: center; gap: 8px; margin-top: 6px; position: relative; z-index: 1; }
@@ -132,9 +166,14 @@
     padding: 5px 0;
     border-radius: 10px;
     letter-spacing: .04em;
+    background: var(--pt);
+    color: var(--pc);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  .ptag.t1 { background: rgba(232,86,42,.14); color: var(--gav); transform: rotate(-2deg); }
-  .ptag.t2 { background: rgba(31,158,143,.14); color: var(--gin); transform: rotate(2deg); }
+  .ptag.pl0, .ptag.pl2 { transform: rotate(-2deg); }
+  .ptag.pl1, .ptag.pl3 { transform: rotate(2deg); }
   .chips { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; flex: 1 1 auto; }
   .chip {
     appearance: none;
@@ -153,8 +192,17 @@
   }
   .chip:active { transform: scale(.94) rotate(-2deg); }
   .chip.on { color: #fffdf5; animation: pop .3s ease; }
-  .chip.on.c1 { background: var(--gav); border-color: #b93c17; transform: rotate(-2deg); }
-  .chip.on.c2 { background: var(--gin); border-color: #14776b; transform: rotate(2deg); }
+  .chip.on { background: var(--pc); border-color: var(--pd); }
+  .chip.on.pl0, .chip.on.pl2 { transform: rotate(-2deg); }
+  .chip.on.pl1, .chip.on.pl3 { transform: rotate(2deg); }
+
+  /* Three or four players: same look, tighter rows so the page stays short. */
+  .dense .game { padding: 7px 8px 9px; margin-bottom: 9px; }
+  .dense .ghead { margin-bottom: 3px; }
+  .dense .prow { margin-top: 4px; gap: 6px; }
+  .dense .ptag { width: 46px; flex-basis: 46px; font-size: 11px; padding: 4px 0; }
+  .dense .chips { gap: 6px; }
+  .dense .chip { padding: 7px 2px; font-size: 15px; border-radius: 12px; border-width: 2px; }
   @keyframes pop {
     0% { transform: scale(.8) rotate(0deg); }
     55% { transform: scale(1.12) rotate(3deg); }
@@ -194,8 +242,7 @@
     color: #fffdf5;
     box-shadow: 2px 3px 0 var(--shadow);
   }
-  .winbtn.b1 { background: var(--gav); }
-  .winbtn.b2 { background: var(--gin); }
+  .winbtn { background: var(--pc); }
   .winbtn:active { transform: translate(2px, 3px); box-shadow: none; }
 
   .ptotal.bump { animation: bump .55s ease; }
@@ -283,6 +330,104 @@
   .hint { font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
   .saved { font-size: 12px; color: var(--muted); opacity: .8; margin: 6px 0 0; }
   .saved.warn { color: #c14a2b; opacity: 1; }
+
+  .noscroll { overflow: hidden; }
+  .modal {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(69,53,34,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal[hidden] { display: none; }
+  .sheet {
+    width: 100%;
+    max-width: 400px;
+    max-height: 90vh;
+    overflow: auto;
+    background: var(--paper);
+    border: 3px solid var(--line);
+    border-radius: 22px;
+    padding: 14px;
+    box-shadow: 3px 4px 0 var(--shadow);
+  }
+  .sheet h2 { font-size: 19px; margin: 0 0 2px; }
+  .sheet .s { font-size: 13px; color: var(--muted); margin: 0 0 12px; line-height: 1.4; }
+  .plrow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .dot { width: 22px; height: 22px; flex: 0 0 22px; border-radius: 50%; background: var(--pc); border: 2px solid var(--pd); }
+  .inp {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 3px solid var(--line);
+    background: #fffaee;
+    border-radius: 12px;
+    padding: 8px 10px;
+    font: inherit;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--ink);
+    outline: none;
+  }
+  .inp:focus { border-color: var(--pc); }
+  .xbtn {
+    appearance: none;
+    flex: 0 0 auto;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 6px;
+    border: 3px solid var(--line);
+    background: #fffaee;
+    border-radius: 12px;
+    color: var(--muted);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .xbtn svg { width: 16px; height: 16px; }
+  .xbtn.arm { border-color: #d1462b; color: #d1462b; padding: 0 10px; }
+  .xs { flex: 0 0 40px; }
+  .addp {
+    appearance: none;
+    display: block;
+    width: 100%;
+    margin: 4px 0 10px;
+    padding: 10px;
+    background: transparent;
+    border: 3px dashed var(--line);
+    border-radius: 14px;
+    color: var(--muted);
+    font: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .addp[hidden] { display: none; }
+  .donebtn {
+    appearance: none;
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: #e8562a;
+    color: #fffdf5;
+    border: 3px solid rgba(69,53,34,.25);
+    border-radius: 14px;
+    font: inherit;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 2px 3px 0 var(--shadow);
+  }
+  .donebtn:active { transform: translate(2px, 3px); box-shadow: none; }
+  .sheet .note { font-size: 12px; color: var(--muted); margin: 10px 0 0; line-height: 1.45; }
 </style>
 </head>
 <body>
@@ -311,30 +456,35 @@
 <div class="wrap">
 
   <header class="top">
-    <p class="banner">Goat Watch</p>
-    <div class="scoreboard">
-      <div class="pcard p1">
-        <div class="pmug"><svg><use href="#goat"></use></svg><span class="pname" id="name0">GAV</span></div>
-        <div class="ptotal" id="total0">0</div>
-        <div class="plabel">rounds won</div>
-      </div>
-      <div class="pcard p2">
-        <div class="pmug"><svg><use href="#goat"></use></svg><span class="pname" id="name1">GIN</span></div>
-        <div class="ptotal" id="total1">0</div>
-        <div class="plabel">rounds won</div>
-      </div>
+    <div class="bannerrow">
+      <p class="banner">Goat Watch</p>
+      <button class="gear" id="gear" type="button" aria-label="Players and names">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>
+      </button>
     </div>
+    <div class="scoreboard" id="scoreboard"></div>
   </header>
 
   <main id="games"></main>
 
   <div class="footer">
     <button class="undo" id="undo" type="button" hidden></button>
-    <button class="reset" id="reset">Reset everything</button>
+    <button class="reset" id="reset">Reset all scores</button>
     <p class="hint">Tap a word to claim it, tap again to un-claim. Claim all three and the round is yours.</p>
     <p class="saved" id="saved">Scores save automatically on this device.</p>
   </div>
 
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <h2 id="sheetTitle">Players</h2>
+    <p class="s">Rename anyone, or add up to four players. Scores are kept when you rename.</p>
+    <div id="plist"></div>
+    <button class="addp" id="addp" type="button">+ Add player</button>
+    <button class="donebtn" id="done" type="button">Done</button>
+    <p class="note">The first two players cannot be removed. Removing the last player asks you to confirm, because it deletes their scores. Adding or removing a player also clears the undo button.</p>
+  </div>
 </div>
 
 <script>
@@ -347,28 +497,56 @@
     { words: ['flag', 'wag', 'stag'] }
   ];
 
-  var NAMES = ['GAV', 'GIN'];
+  var MIN_PLAYERS = 2;
+  var MAX_PLAYERS = 4;
+  var MAX_NAME = 6;
+  var DEFAULT_NAMES = ['GAV', 'GIN', 'P3', 'P4'];
   var SVG_NS = 'http://www.w3.org/2000/svg';
 
   var gamesEl = document.getElementById('games');
-  var totalEls = [document.getElementById('total0'), document.getElementById('total1')];
+  var scoreEl = document.getElementById('scoreboard');
   var resetBtn = document.getElementById('reset');
   var undoBtn = document.getElementById('undo');
+  var gearBtn = document.getElementById('gear');
+  var modal = document.getElementById('modal');
+  var plist = document.getElementById('plist');
+  var addBtn = document.getElementById('addp');
+  var doneBtn = document.getElementById('done');
 
-  var totals = [0, 0];
+  var names = DEFAULT_NAMES.slice(0, MIN_PLAYERS);
+  var totals = [];
   var state = [];
   var ui = [];
+  var nameEls = [];
+  var totalEls = [];
   var lastScore = null;
 
-  function blankClaims() {
-    return [[false, false, false], [false, false, false]];
+  function zeros(n) {
+    var a = [];
+    for (var i = 0; i < n; i++) a.push(0);
+    return a;
+  }
+
+  function blankClaims(np) {
+    var rows = [];
+    for (var i = 0; i < np; i++) rows.push([false, false, false]);
+    return rows;
+  }
+
+  function copyClaims(claims) {
+    return claims.map(function (row) { return row.slice(); });
+  }
+
+  function nameOf(i) {
+    return (names[i] || '').trim() || DEFAULT_NAMES[i];
   }
 
   function initState() {
+    var np = names.length;
     state = GAMES.map(function () {
-      return { claims: blankClaims(), wins: [0, 0], pending: null };
+      return { claims: blankClaims(np), wins: zeros(np), pending: null };
     });
-    totals = [0, 0];
+    totals = zeros(np);
     lastScore = null;
   }
 
@@ -388,34 +566,62 @@
     return node;
   }
 
-  // Built once. render() only ever mutates text and classes after this.
-  function build() {
+  function buildScoreboard() {
+    var np = names.length;
+    scoreEl.innerHTML = '';
+    scoreEl.className = 'scoreboard n' + np;
+    nameEls = [];
+    totalEls = [];
+    for (var pi = 0; pi < np; pi++) {
+      var card = el('div', 'pcard pl' + pi);
+      var mug = el('div', 'pmug');
+      mug.appendChild(goatSvg());
+      var nm = el('span', 'pname', nameOf(pi));
+      mug.appendChild(nm);
+      var tot = el('div', 'ptotal', '0');
+      card.appendChild(mug);
+      card.appendChild(tot);
+      card.appendChild(el('div', 'plabel', 'rounds won'));
+      nameEls.push(nm);
+      totalEls.push(tot);
+      scoreEl.appendChild(card);
+    }
+  }
+
+  // Rebuilt only when the player count changes. render() just mutates text and classes.
+  function buildGames() {
+    var np = names.length;
     var frag = document.createDocumentFragment();
+    gamesEl.className = np > 2 ? 'dense' : '';
 
     GAMES.forEach(function (game, gi) {
-      var label = game.words.join(' \u00b7 ');
+      var label = game.words.join(' · ');
       var card = el('section', 'game');
-      var refs = { chips: [[], []], card: card };
+      var refs = { chips: [], tags: [], wins: [], card: card };
 
       card.appendChild(goatSvg('ghost'));
 
       var head = el('div', 'ghead');
       head.appendChild(el('div', 'gtitle', label));
       var wins = el('div', 'gwins');
-      refs.w1 = el('span', 'w1', '0');
-      refs.w2 = el('span', 'w2', '0');
-      wins.appendChild(refs.w1);
-      wins.appendChild(el('span', 'sep', '-'));
-      wins.appendChild(refs.w2);
+      for (var wp = 0; wp < np; wp++) {
+        if (wp) wins.appendChild(el('span', 'sep', '-'));
+        var wspan = el('span', 'w pl' + wp, '0');
+        refs.wins.push(wspan);
+        wins.appendChild(wspan);
+      }
       head.appendChild(wins);
       card.appendChild(head);
 
-      [0, 1].forEach(function (pi) {
+      for (var pi = 0; pi < np; pi++) {
         var row = el('div', 'prow');
-        row.appendChild(el('div', 'ptag t' + (pi + 1), NAMES[pi]));
+        var tag = el('div', 'ptag pl' + pi, nameOf(pi));
+        refs.tags.push(tag);
+        row.appendChild(tag);
         var chips = el('div', 'chips');
+        refs.chips[pi] = [];
         game.words.forEach(function (word, wi) {
-          var chip = el('button', 'chip c' + (pi + 1), word);
+          var chip = el('button', 'chip pl' + pi, word);
           chip.type = 'button';
           chip.dataset.g = gi;
           chip.dataset.p = pi;
@@ -426,7 +632,7 @@
         });
         row.appendChild(chips);
         card.appendChild(row);
-      });
+      }
 
       var bar = el('div', 'winbar');
       bar.hidden = true;
@@ -448,6 +654,14 @@
     gamesEl.appendChild(frag);
   }
 
+  function rebuild() {
+    ui = [];
+    gamesEl.innerHTML = '';
+    buildScoreboard();
+    buildGames();
+    render();
+  }
+
   function toggle(gi, pi, wi) {
     var g = state[gi];
     if (g.pending !== null) return;
@@ -463,11 +677,11 @@
     var pi = g.pending;
 
     // Snapshot just this game so undo cannot clobber progress made elsewhere.
-    lastScore = { gi: gi, pi: pi, claims: g.claims.map(function (row) { return row.slice(); }) };
+    lastScore = { gi: gi, pi: pi, claims: copyClaims(g.claims) };
 
     g.wins[pi] += 1;
     totals[pi] += 1;
-    g.claims = blankClaims();
+    g.claims = blankClaims(names.length);
     g.pending = null;
     render();
     save();
@@ -481,7 +695,7 @@
     g.wins[snap.pi] -= 1;
     totals[snap.pi] -= 1;
     // Board goes back to all three claimed, but unlocked, so the bad call can be tapped off.
-    g.claims = snap.claims.map(function (row) { return row.slice(); });
+    g.claims = copyClaims(snap.claims);
     g.pending = null;
     lastScore = null;
     render();
@@ -504,7 +718,7 @@
     }, 1000);
   }
 
-  var CONFETTI_COLOURS = ['#e8562a', '#1f9e8f', '#e8b42a', '#c8a04a', '#7bc47f'];
+  var CONFETTI_COLOURS = ['#e8562a', '#1f9e8f', '#e8b42a', '#8a5cc2', '#7bc47f'];
 
   function confetti(bar) {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -528,17 +742,20 @@
   }
 
   function render() {
-    totalEls[0].textContent = totals[0];
-    totalEls[1].textContent = totals[1];
+    var np = names.length;
+
+    for (var p = 0; p < np; p++) {
+      nameEls[p].textContent = nameOf(p);
+      totalEls[p].textContent = totals[p];
+    }
 
     for (var gi = 0; gi < state.length; gi++) {
       var g = state[gi];
       var r = ui[gi];
 
-      r.w1.textContent = g.wins[0];
-      r.w2.textContent = g.wins[1];
-
-      for (var pi = 0; pi < 2; pi++) {
+      for (var pi = 0; pi < np; pi++) {
+        r.tags[pi].textContent = nameOf(pi);
+        r.wins[pi].textContent = g.wins[pi];
         for (var wi = 0; wi < 3; wi++) {
           var on = g.claims[pi][wi];
           var chip = r.chips[pi][wi];
@@ -550,8 +767,8 @@
       if (g.pending === null) {
         r.bar.hidden = true;
       } else {
-        r.winText.textContent = NAMES[g.pending] + ' wins the round!';
-        r.winBtn.className = 'winbtn b' + (g.pending + 1);
+        r.winText.textContent = nameOf(g.pending) + ' wins the round!';
+        r.winBtn.className = 'winbtn pl' + g.pending;
         if (r.bar.hidden) {
           r.bar.hidden = false;
           confetti(r.bar);
@@ -560,7 +777,7 @@
     }
 
     if (lastScore) {
-      undoBtn.textContent = 'Undo: ' + NAMES[lastScore.pi] + ' on ' + GAMES[lastScore.gi].words.join(' \u00b7 ');
+      undoBtn.textContent = 'Undo: ' + nameOf(lastScore.pi) + ' on ' + GAMES[lastScore.gi].words.join(' · ');
       undoBtn.hidden = false;
     } else {
       undoBtn.hidden = true;
@@ -568,11 +785,13 @@
   }
 
   // ---- persistence -------------------------------------------------------
-  // Version plus a signature of the game and player setup, so a saved board
-  // from an older word list is discarded instead of restored into a mismatch.
+  // One blob holds the names, the scores and the boards, so they can never disagree
+  // about how many players there are. The signature covers the word lists only.
   var STORE_KEY = 'goatwatch';
-  var STORE_VERSION = 1;
-  var SIG = GAMES.map(function (g) { return g.words.join(','); }).join('|') + '::' + NAMES.join(',');
+  var STORE_VERSION = 2;
+  var GAMES_SIG = GAMES.map(function (g) { return g.words.join(','); }).join('|');
+  // Saves from before player editing existed: two fixed players, names in the signature.
+  var LEGACY_SIG = GAMES_SIG + '::GAV,GIN';
   var savedEl = document.getElementById('saved');
   var canStore = true;
 
@@ -587,8 +806,9 @@
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify({
         v: STORE_VERSION,
-        sig: SIG,
+        sig: GAMES_SIG,
         at: now,
+        names: names,
         totals: totals,
         state: state,
         lastScore: lastScore
@@ -605,14 +825,22 @@
     savedEl.textContent = 'Not saving on this device. Private browsing blocks storage.';
   }
 
-  function validClaims(claims, n) {
-    return Array.isArray(claims) && claims.length === 2 && claims.every(function (row) {
-      return Array.isArray(row) && row.length === n && row.every(function (v) { return typeof v === 'boolean'; });
+  function validName(s) {
+    return typeof s === 'string' && s.trim().length > 0 && s.length <= MAX_NAME;
+  }
+
+  function validClaims(claims, wordCount, np) {
+    return Array.isArray(claims) && claims.length === np && claims.every(function (row) {
+      return Array.isArray(row) && row.length === wordCount && row.every(function (v) { return typeof v === 'boolean'; });
     });
   }
 
-  function validPlayer(pi) {
-    return pi === 0 || pi === 1;
+  function validPlayer(pi, np) {
+    return typeof pi === 'number' && pi >= 0 && pi < np && pi === Math.floor(pi);
+  }
+
+  function count(x) {
+    return Math.max(0, x | 0);
   }
 
   function load() {
@@ -627,32 +855,196 @@
 
     var d;
     try { d = JSON.parse(raw); } catch (e) { return false; }
+    if (!d) return false;
 
-    if (!d || d.v !== STORE_VERSION || d.sig !== SIG) return false;
-    if (!Array.isArray(d.totals) || d.totals.length !== 2) return false;
+    var nm;
+    if (d.v === STORE_VERSION && d.sig === GAMES_SIG) {
+      nm = d.names;
+      if (!Array.isArray(nm) || nm.length < MIN_PLAYERS || nm.length > MAX_PLAYERS || !nm.every(validName)) return false;
+    } else if (d.v === 1 && d.sig === LEGACY_SIG) {
+      nm = DEFAULT_NAMES.slice(0, 2);
+    } else {
+      return false;
+    }
+    var np = nm.length;
+
+    if (!Array.isArray(d.totals) || d.totals.length !== np) return false;
     if (!Array.isArray(d.state) || d.state.length !== GAMES.length) return false;
 
     for (var i = 0; i < d.state.length; i++) {
       var g = d.state[i];
       if (!g) return false;
-      if (!validClaims(g.claims, GAMES[i].words.length)) return false;
-      if (!Array.isArray(g.wins) || g.wins.length !== 2) return false;
-      if (g.pending !== null && !validPlayer(g.pending)) return false;
+      if (!validClaims(g.claims, GAMES[i].words.length, np)) return false;
+      if (!Array.isArray(g.wins) || g.wins.length !== np) return false;
+      if (g.pending !== null && !validPlayer(g.pending, np)) return false;
     }
 
+    names = nm.slice();
     state = d.state.map(function (g) {
-      return { claims: g.claims, wins: [g.wins[0] | 0, g.wins[1] | 0], pending: g.pending };
+      return { claims: g.claims, wins: g.wins.map(count), pending: g.pending };
     });
-    totals = [d.totals[0] | 0, d.totals[1] | 0];
+    totals = d.totals.map(count);
 
     var ls = d.lastScore;
-    lastScore = (ls && GAMES[ls.gi] && validPlayer(ls.pi) && validClaims(ls.claims, GAMES[ls.gi].words.length))
+    lastScore = (ls && GAMES[ls.gi] && validPlayer(ls.pi, np) && validClaims(ls.claims, GAMES[ls.gi].words.length, np))
       ? { gi: ls.gi, pi: ls.pi, claims: ls.claims }
       : null;
 
     if (d.at) stamp(d.at);
     return true;
   }
+
+  // ---- players panel ------------------------------------------------------
+  var removeArmed = false;
+  var removeTimer = null;
+
+  function disarmRemove() {
+    clearTimeout(removeTimer);
+    removeArmed = false;
+  }
+
+  function crossSvg() {
+    var svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 16 16');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '2.6');
+    svg.setAttribute('stroke-linecap', 'round');
+    var path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('d', 'M3 3l10 10M13 3L3 13');
+    svg.appendChild(path);
+    return svg;
+  }
+
+  function renderPlist() {
+    var np = names.length;
+    plist.innerHTML = '';
+
+    names.forEach(function (n, i) {
+      var row = el('div', 'plrow pl' + i);
+      row.appendChild(el('div', 'dot pl' + i));
+
+      var input = el('input', 'inp');
+      input.type = 'text';
+      input.value = n;
+      input.maxLength = MAX_NAME;
+      input.autocomplete = 'off';
+      input.spellcheck = false;
+      input.setAttribute('autocapitalize', 'characters');
+      input.setAttribute('aria-label', 'Player ' + (i + 1) + ' name');
+      input.addEventListener('input', function () {
+        names[i] = input.value.toUpperCase();
+        render();
+        save();
+      });
+      input.addEventListener('blur', function () {
+        if (!names[i].trim()) {
+          names[i] = DEFAULT_NAMES[i];
+          input.value = names[i];
+          render();
+          save();
+        }
+      });
+      row.appendChild(input);
+
+      if (i === np - 1 && np > MIN_PLAYERS) {
+        var x = el('button', 'xbtn' + (removeArmed ? ' arm' : ''));
+        x.type = 'button';
+        if (removeArmed) {
+          x.textContent = 'Delete?';
+          x.setAttribute('aria-label', 'Tap again to remove ' + nameOf(i) + ' and delete their scores');
+        } else {
+          x.appendChild(crossSvg());
+          x.setAttribute('aria-label', 'Remove ' + nameOf(i));
+        }
+        x.addEventListener('click', function () {
+          if (!removeArmed) {
+            removeArmed = true;
+            removeTimer = setTimeout(function () {
+              removeArmed = false;
+              renderPlist();
+            }, 3000);
+            renderPlist();
+            return;
+          }
+          removePlayer();
+        });
+        row.appendChild(x);
+      } else {
+        row.appendChild(el('div', 'xs'));
+      }
+
+      plist.appendChild(row);
+    });
+
+    addBtn.hidden = np >= MAX_PLAYERS;
+  }
+
+  function addPlayer() {
+    var np = names.length;
+    if (np >= MAX_PLAYERS) return;
+    disarmRemove();
+    names.push(DEFAULT_NAMES[np]);
+    totals.push(0);
+    state.forEach(function (g) {
+      g.claims.push([false, false, false]);
+      g.wins.push(0);
+    });
+    lastScore = null;
+    rebuild();
+    renderPlist();
+    save();
+    var inputs = plist.querySelectorAll('.inp');
+    var last = inputs[inputs.length - 1];
+    if (last) { last.focus(); last.select(); }
+  }
+
+  function removePlayer() {
+    var np = names.length;
+    disarmRemove();
+    if (np <= MIN_PLAYERS) return;
+    names.pop();
+    totals.pop();
+    state.forEach(function (g) {
+      g.claims.pop();
+      g.wins.pop();
+      if (g.pending !== null && g.pending >= names.length) g.pending = null;
+    });
+    lastScore = null;
+    rebuild();
+    renderPlist();
+    save();
+  }
+
+  function openSettings() {
+    disarmRemove();
+    renderPlist();
+    modal.hidden = false;
+    document.body.classList.add('noscroll');
+    doneBtn.focus();
+  }
+
+  function closeSettings() {
+    disarmRemove();
+    for (var i = 0; i < names.length; i++) {
+      if (!names[i].trim()) names[i] = DEFAULT_NAMES[i];
+    }
+    modal.hidden = true;
+    document.body.classList.remove('noscroll');
+    render();
+    save();
+    gearBtn.focus();
+  }
+
+  gearBtn.addEventListener('click', openSettings);
+  doneBtn.addEventListener('click', closeSettings);
+  addBtn.addEventListener('click', addPlayer);
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) closeSettings();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !modal.hidden) closeSettings();
+  });
 
   undoBtn.addEventListener('click', undoScore);
 
@@ -672,7 +1064,7 @@
   function disarm() {
     armed = false;
     resetBtn.classList.remove('arm');
-    resetBtn.textContent = 'Reset everything';
+    resetBtn.textContent = 'Reset all scores';
   }
   resetBtn.addEventListener('click', function () {
     if (!armed) {
@@ -691,8 +1083,7 @@
 
   initState();
   load();
-  build();
-  render();
+  rebuild();
 })();
 </script>
 </body>

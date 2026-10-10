@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Goat Watch: player options mockup</title>
+<style>
+  :root {
+    --bg:#fdf3dc; --paper:#fffdf5; --ink:#453522; --muted:#9a8768; --line:#d8c4a0; --shadow:rgba(69,53,34,.22);
+    --p0:#e8562a; --p1:#1f9e8f; --p2:#8a5cc2; --p3:#d9a21b;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:20px 14px 40px; background:#e9e4d8; color:var(--ink);
+    font-family:"Comic Sans MS","Chalkboard SE","Marker Felt",cursive; }
+  h1 { font-size:20px; margin:0 0 4px; text-align:center; }
+  .sub { text-align:center; color:#7a6a50; font-size:13px; margin:0 0 20px; }
+  .row { display:flex; flex-wrap:wrap; gap:22px; justify-content:center; align-items:flex-start; }
+  .col { width:330px; }
+  .tag { font-size:13px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; margin:0 0 8px; text-align:center; color:#5a4a33; }
+  .phone { background:var(--bg); border:6px solid #2b2b2b; border-radius:30px; padding:10px 10px 14px; height:620px; overflow:hidden; position:relative; }
+  .cap { font-size:13px; line-height:1.45; margin:12px 4px 0; color:#4a3d2a; }
+  .cap b { color:#2b2113; }
+  .good { color:#1d7a4a; font-weight:700; }
+  .bad { color:#b8421f; font-weight:700; }
+
+  .banner { display:flex; align-items:center; justify-content:space-between; margin:0 2px 6px; }
+  .banner span { font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+  .gear { width:30px; height:30px; border-radius:50%; border:2px dashed var(--line); background:var(--paper);
+    display:flex; align-items:center; justify-content:center; font-size:15px; }
+
+  .sb { display:grid; gap:6px; margin-bottom:8px; }
+  .sb.n2 { grid-template-columns:1fr 1fr; }
+  .sb.n4 { grid-template-columns:repeat(4,1fr); }
+  .pc { background:var(--paper); border:3px solid; border-radius:14px; text-align:center; padding:3px 2px 4px; box-shadow:2px 3px 0 var(--shadow); }
+  .pc .nm { font-size:13px; font-weight:700; }
+  .pc .nu { font-size:26px; font-weight:700; line-height:1; color:var(--ink); }
+
+  .game { background:var(--paper); border:3px dashed var(--line); border-radius:16px; padding:6px 7px 8px; margin-bottom:8px; box-shadow:2px 3px 0 var(--shadow); }
+  .gh { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+  .gt { font-size:12px; font-weight:700; letter-spacing:.05em; color:var(--muted); }
+  .gw { font-size:12px; font-weight:700; }
+  .pr { display:flex; align-items:center; gap:5px; margin-top:4px; }
+  .pt { width:30px; flex:0 0 30px; font-size:10.5px; font-weight:700; text-align:center; padding:3px 0; border-radius:7px; }
+  .ch { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; flex:1; }
+  .c { border:2px solid var(--line); background:#fffaee; color:var(--muted); font-size:12.5px; font-weight:700; text-align:center;
+       border-radius:10px; padding:5px 0; }
+  .c.on { color:#fffdf5; }
+
+  /* cycling layout */
+  .big { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:2px; }
+  .bc { border:3px solid var(--line); background:#fffaee; color:var(--muted); border-radius:14px; padding:10px 2px 7px; text-align:center; font-weight:700; font-size:15px; }
+  .bc small { display:block; font-size:11px; letter-spacing:.06em; margin-top:2px; opacity:.95; }
+  .bc.on { color:#fffdf5; }
+  .pips { display:flex; gap:6px; margin-top:7px; flex-wrap:wrap; }
+  .pip { display:flex; align-items:center; gap:3px; font-size:10.5px; font-weight:700; padding:2px 6px; border-radius:999px; }
+  .pip i { width:7px; height:7px; border-radius:50%; display:inline-block; border:1.5px solid currentColor; }
+  .pip i.f { background:currentColor; }
+  .dead { font-size:11px; color:#b8421f; margin-top:6px; font-weight:700; }
+
+  /* settings panel */
+  .sheet { background:var(--paper); border:3px solid var(--line); border-radius:20px; padding:12px; box-shadow:3px 4px 0 var(--shadow); }
+  .sheet h2 { font-size:17px; margin:0 0 2px; }
+  .sheet p.s { font-size:12px; color:var(--muted); margin:0 0 10px; line-height:1.4; }
+  .prow { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .dot { width:22px; height:22px; border-radius:50%; flex:0 0 22px; border:2px solid rgba(0,0,0,.18); }
+  .inp { flex:1; border:3px solid var(--line); background:#fffaee; border-radius:12px; padding:8px 10px; font:inherit; font-weight:700; font-size:16px; color:var(--ink); letter-spacing:.05em; }
+  .x { width:34px; height:34px; border-radius:10px; border:3px solid var(--line); text-align:center; line-height:26px; font-size:17px; color:var(--muted); background:#fffaee; }
+  .x.dim { opacity:.35; }
+  .add { border:3px dashed var(--line); border-radius:14px; text-align:center; padding:9px; font-weight:700; color:var(--muted); margin:4px 0 10px; font-size:15px; }
+  .done { background:var(--p0); color:#fffdf5; border-radius:14px; padding:11px; text-align:center; font-weight:700; font-size:16px; border:3px solid rgba(69,53,34,.25); box-shadow:2px 3px 0 var(--shadow); }
+  .note { font-size:11.5px; color:var(--muted); margin-top:10px; line-height:1.45; }
+  .fade { position:absolute; left:0; right:0; bottom:0; height:56px; background:linear-gradient(180deg,rgba(253,243,220,0),var(--bg) 85%); }
+  .more { position:absolute; left:0; right:0; bottom:14px; text-align:center; font-size:12px; color:var(--muted); font-weight:700; }
+</style>
+</head>
+<body>
+<h1>Goat Watch: more players, editable names</h1>
+<p class="sub">Mockup only. Four example players shown. Defaults would still load as GAV and GIN.</p>
+
+<div class="row" id="root"></div>
+
+<script>
+var COL = ['var(--p0)','var(--p1)','var(--p2)','var(--p3)'];
+var NAMES = ['GAV','GIN','ROB','EVE'];
+var TINT = ['rgba(232,86,42,.15)','rgba(31,158,143,.15)','rgba(138,92,194,.15)','rgba(217,162,27,.17)'];
+var DARK = ['#b93c17','#14776b','#6b43a3','#a97c10'];
+
+// claims[player] = array of 3 booleans, for game 1 and game 2
+var G = [
+  { t:'float · boat · goat', w:['float','boat','goat'], wins:[1,0,0,0],
+    cl:[[1,1,0],[0,1,0],[1,0,1],[0,0,0]] },
+  { t:'rode · toed · hoed', w:['rode','toed','hoed'], wins:[0,1,0,0],
+    cl:[[0,0,0],[1,1,1],[0,1,0],[1,0,0]] }
+];
+
+function scoreboard(n, totals){
+  var h = '<div class="sb n'+(n===2?2:4)+'">';
+  for(var i=0;i<n;i++){
+    h += '<div class="pc" style="border-color:'+COL[i]+'"><div class="nm" style="color:'+COL[i]+'">'+NAMES[i]+'</div><div class="nu">'+totals[i]+'</div></div>';
+  }
+  return h+'</div>';
+}
+function banner(){
+  return '<div class="banner"><span>Goat Watch</span><div class="gear">&#9881;</div></div>';
+}
+
+/* ---------- Frame 1: settings ---------- */
+function settings(){
+  var h = '<div class="phone">'+banner()+'<div class="sheet"><h2>Players</h2><p class="s">Rename anyone, or add up to six players. Scores are kept when you rename.</p>';
+  for(var i=0;i<4;i++){
+    h += '<div class="prow"><div class="dot" style="background:'+COL[i]+'"></div><div class="inp">'+NAMES[i]+'</div><div class="x'+(i<2?' dim':'')+'">&times;</div></div>';
+  }
+  h += '<div class="add">+ Add player</div><div class="done">Done</div>';
+  h += '<div class="note">First two players cannot be removed. Removing a player asks for confirmation, because it deletes their scores.</div></div></div>';
+  return h;
+}
+
+/* ---------- Frame 2: rows per player ---------- */
+function rows(){
+  var h = '<div class="phone">'+banner()+scoreboard(4,[1,1,0,0]);
+  G.forEach(function(g){
+    h += '<div class="game"><div class="gh"><div class="gt">'+g.t+'</div><div class="gw">'+g.wins.join(' - ')+'</div></div>';
+    for(var p=0;p<4;p++){
+      h += '<div class="pr"><div class="pt" style="background:'+TINT[p]+';color:'+COL[p]+'">'+NAMES[p]+'</div><div class="ch">';
+      for(var w=0;w<3;w++){
+        var on = g.cl[p][w];
+        h += '<div class="c'+(on?' on':'')+'"'+(on?' style="background:'+COL[p]+';border-color:'+DARK[p]+'"':'')+'>'+g.w[w]+'</div>';
+      }
+      h += '</div></div>';
+    }
+    h += '</div>';
+  });
+  h += '<div class="fade"></div><div class="more">3 more games below</div></div>';
+  return h;
+}
+
+/* ---------- Frame 3: one row, tap to cycle ---------- */
+function cycle(){
+  var h = '<div class="phone">'+banner()+scoreboard(4,[1,1,0,0]);
+  var owners = [
+    [0,1,2],          // game 1: float=GAV, boat=GIN, goat=ROB  (everyone split)
+    [1,1,3]           // game 2: rode=GIN, toed=GIN, hoed=EVE
+  ];
+  G.forEach(function(g,gi){
+    h += '<div class="game"><div class="gh"><div class="gt">'+g.t+'</div><div class="gw">'+g.wins.join(' - ')+'</div></div><div class="big">';
+    for(var w=0;w<3;w++){
+      var o = owners[gi][w];
+      h += '<div class="bc on" style="background:'+COL[o]+';border-color:'+DARK[o]+'">'+g.w[w]+'<small>'+NAMES[o]+'</small></div>';
+    }
+    h += '</div><div class="pips">';
+    for(var p=0;p<4;p++){
+      var cnt = owners[gi].filter(function(x){return x===p;}).length;
+      h += '<div class="pip" style="background:'+TINT[p]+';color:'+COL[p]+'">'+NAMES[p]+' ';
+      for(var k=0;k<3;k++) h += '<i class="'+(k<cnt?'f':'')+'"></i>';
+      h += '</div>';
+    }
+    h += '</div>';
+    if(gi===0) h += '<div class="dead">Words split three ways: nobody can win this round now.</div>';
+    h += '</div>';
+  });
+  h += '<div class="fade"></div><div class="more">3 more games below</div></div>';
+  return h;
+}
+
+var root = document.getElementById('root');
+root.innerHTML =
+ '<div class="col"><div class="tag">1. Settings panel</div>'+settings()+
+   '<div class="cap">A gear button in the corner opens this. Loads as <b>GAV</b> and <b>GIN</b>; nothing changes unless you tap it.</div></div>'+
+ '<div class="col"><div class="tag">2. A row per player</div>'+rows()+
+   '<div class="cap"><span class="good">Progress is obvious:</span> your row, your colour, filled chips. Everyone can hold the same word. <span class="bad">Cost:</span> every extra player adds a row to every card, so four players is about two screens of scrolling.</div></div>'+
+ '<div class="col"><div class="tag">3. One row, tap to cycle</div>'+cycle()+
+   '<div class="cap"><span class="good">Compact:</span> stays one row per game at any player count. <span class="bad">Cost:</span> each word has a single owner, so progress hides in the colours (the dots help), and it only works if a word can only be claimed once per round.</div></div>';
+</script>
+</body>
+</html>
